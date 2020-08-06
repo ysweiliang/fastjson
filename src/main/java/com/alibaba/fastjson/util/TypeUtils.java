@@ -258,6 +258,11 @@ public class TypeUtils{
             }
             return Byte.parseByte(strVal);
         }
+
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue() ? (byte) 1 : (byte) 0;
+        }
+
         throw new JSONException("can not cast to byte, value : " + value);
     }
 
@@ -302,6 +307,10 @@ public class TypeUtils{
                 return null;
             }
             return Short.parseShort(strVal);
+        }
+
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue() ? (short) 1 : (short) 0;
         }
 
         throw new JSONException("can not cast to short, value : " + value);
@@ -381,6 +390,11 @@ public class TypeUtils{
             }
             return Float.parseFloat(strVal);
         }
+
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue() ? 1F : 0F;
+        }
+
         throw new JSONException("can not cast to float, value : " + value);
     }
 
@@ -403,6 +417,11 @@ public class TypeUtils{
             }
             return Double.parseDouble(strVal);
         }
+
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue() ? 1D : 0D;
+        }
+
         throw new JSONException("can not cast to double, value : " + value);
     }
 
@@ -454,7 +473,7 @@ public class TypeUtils{
                 strVal = strVal.substring(6, strVal.length() - 2);
             }
 
-            if (strVal.indexOf('-') > 0 || strVal.indexOf('+') > 0) {
+            if (strVal.indexOf('-') > 0 || strVal.indexOf('+') > 0 || format != null) {
                 if (format == null) {
                     if (strVal.length() == JSON.DEFFAULT_DATE_FORMAT.length()
                             || (strVal.length() == 22 && JSON.DEFFAULT_DATE_FORMAT.equals("yyyyMMddHHmmssSSSZ"))) {
@@ -849,6 +868,10 @@ public class TypeUtils{
                 Object value2 = iter.next();
                 return castToLong(value2);
             }
+        }
+
+        if (value instanceof Boolean) {
+            return ((Boolean) value).booleanValue() ? 1L : 0L;
         }
 
         throw new JSONException("can not cast to long, value : " + value);
@@ -2901,7 +2924,7 @@ public class TypeUtils{
         return Float.parseFloat(str);
     }
 
-    public static long fnv1a_64_lower(String key){
+    public static long fnv1a_64_extract(String key){
         long hashCode = 0xcbf29ce484222325L;
         for(int i = 0; i < key.length(); ++i){
             char ch = key.charAt(i);
@@ -2917,10 +2940,13 @@ public class TypeUtils{
         return hashCode;
     }
 
-    public static long fnv1a_64_extract(String key){
+    public static long fnv1a_64_lower(String key){
         long hashCode = 0xcbf29ce484222325L;
         for(int i = 0; i < key.length(); ++i){
             char ch = key.charAt(i);
+            if(ch >= 'A' && ch <= 'Z'){
+                ch = (char) (ch + 32);
+            }
             hashCode ^= ch;
             hashCode *= 0x100000001b3L;
         }
